@@ -183,6 +183,36 @@
             ],
             generators: [
                 {
+                    name: "Waterwheel",
+                    config: [
+                        ["One face", 16, 4+4 ],
+                        ["Two faces", 16, 4+8 ],
+                        ["Three faces", 16, 4+12 ],
+                        ["Four faces (w/ Soul Sand)", 16, 4+16 ]
+                    ]
+                },
+                {
+                    name: "Windmill Bearing",
+                    config: [
+                        ["8-15 wool/sail blocks", 512, 1 ],
+                        ["16-23 wool/sail blocks", 512, 2 ],
+                        ["24-31 wool/sail blocks", 512, 3 ],
+                        ["32-39 wool/sail blocks", 512, 4 ],
+                        ["40-47 wool/sail blocks", 512, 5 ],
+                        ["48-55 wool/sail blocks", 512, 6 ],
+                        ["56-63 wool/sail blocks", 512, 7 ],
+                        ["64-71 wool/sail blocks", 512, 8 ],
+                        ["72-79 wool/sail blocks", 512, 9 ],
+                        ["80-87 wool/sail blocks", 512, 10 ],
+                        ["88-95 wool/sail blocks", 512, 11 ],
+                        ["96-103 wool/sail blocks", 512, 12 ],
+                        ["104-111 wool/sail blocks", 512, 13 ],
+                        ["112-119 wool/sail blocks", 512, 14 ],
+                        ["120-127 wool/sail blocks", 512, 15 ],
+                        ["128+ wool/sail blocks", 512, 16 ]
+                    ]
+                },
+                {
                     name: "Encased Fan",
                     config: [
                         ["Default", 16, 4 ]
@@ -208,71 +238,64 @@
                     ]
                 },
                 {
-                    name: "Windmill Bearing",
-                    config: [
-                        ["8-15 wool/sail blocks", 512, 1 ],
-                        ["16-23 wool/sail blocks", 512, 2 ],
-                        ["24-31 wool/sail blocks", 512, 3 ],
-                        ["32-39 wool/sail blocks", 512, 4 ],
-                        ["40-47 wool/sail blocks", 512, 5 ],
-                        ["48-55 wool/sail blocks", 512, 6 ],
-                        ["56-63 wool/sail blocks", 512, 7 ],
-                        ["64-71 wool/sail blocks", 512, 8 ],
-                        ["72-79 wool/sail blocks", 512, 9 ],
-                        ["80-87 wool/sail blocks", 512, 10 ],
-                        ["88-95 wool/sail blocks", 512, 11 ],
-                        ["96-103 wool/sail blocks", 512, 12 ],
-                        ["104-111 wool/sail blocks", 512, 13 ],
-                        ["112-119 wool/sail blocks", 512, 14 ],
-                        ["120-127 wool/sail blocks", 512, 15 ],
-                        ["128+ wool/sail blocks", 512, 16 ]
-                    ]
-                },
-                {
-                    name: "Waterwheel",
-                    config: [
-                        ["One face", 16, 4+4 ],
-                        ["Two faces", 16, 4+8 ],
-                        ["Three faces", 16, 4+12 ],
-                        ["Four faces (w/ Soul Sand)", 16, 4+16 ]
-                    ]
-                },
-                {
                     //0,1,2,3,4,8,12,16,20,24,28,32,48,64,80,96,112,128,192,256
                     name: "Creative Motor",
                     config: [
                         ["0 RPM", 0, 0],
-                        ["1 RPM", 1, CREATIVE_SU],
-                        ["2 RPM", 2, CREATIVE_SU],
-                        ["3 RPM", 3, CREATIVE_SU],
-                        ["4 RPM", 4, CREATIVE_SU],
-                        ["8 RPM", 8, CREATIVE_SU],
-                        ["12 RPM", 12, CREATIVE_SU],
-                        ["16 RPM", 16, CREATIVE_SU],
-                        ["20 RPM", 20, CREATIVE_SU],
-                        ["24 RPM", 24, CREATIVE_SU],
-                        ["28 RPM", 28, CREATIVE_SU],
-                        ["32 RPM", 32, CREATIVE_SU],
-                        ["48 RPM", 48, CREATIVE_SU],
-                        ["64 RPM", 64, CREATIVE_SU],
-                        ["80 RPM", 80, CREATIVE_SU],
-                        ["96 RPM", 96, CREATIVE_SU],
-                        ["112 RPM", 112, CREATIVE_SU],
-                        ["128 RPM", 128, CREATIVE_SU],
-                        ["128 RPM", 128, CREATIVE_SU],
-                        ["192 RPM", 192, CREATIVE_SU],
-                        ["256 RPM", 256, CREATIVE_SU]
+                        ["1 RPM", CREATIVE_SU, 1, CREATIVE_SU],
+                        ["2 RPM", CREATIVE_SU, 2, CREATIVE_SU],
+                        ["3 RPM", CREATIVE_SU, 3, CREATIVE_SU],
+                        ["4 RPM", CREATIVE_SU, 4, CREATIVE_SU],
+                        ["8 RPM", CREATIVE_SU, 8, CREATIVE_SU],
+                        ["12 RPM", CREATIVE_SU, 12, CREATIVE_SU],
+                        ["16 RPM", CREATIVE_SU, 16, CREATIVE_SU],
+                        ["20 RPM", CREATIVE_SU, 20, CREATIVE_SU],
+                        ["24 RPM", CREATIVE_SU, 24, CREATIVE_SU],
+                        ["28 RPM", CREATIVE_SU, 28, CREATIVE_SU],
+                        ["32 RPM", CREATIVE_SU, 32, CREATIVE_SU],
+                        ["48 RPM", CREATIVE_SU, 48, CREATIVE_SU],
+                        ["64 RPM", CREATIVE_SU, 64, CREATIVE_SU],
+                        ["80 RPM", CREATIVE_SU, 80, CREATIVE_SU],
+                        ["96 RPM", CREATIVE_SU, 96, CREATIVE_SU],
+                        ["112 RPM", CREATIVE_SU, 112, CREATIVE_SU],
+                        ["128 RPM", CREATIVE_SU, 128, CREATIVE_SU],
+                        ["192 RPM", CREATIVE_SU, 192, CREATIVE_SU],
+                        ["256 RPM", CREATIVE_SU, 256, CREATIVE_SU]
                     ]
                 }
             ]
         };
 
+        function updateSpeedDropdownLabels() {
+            //check if there's only one generator
+            var singleGenSpeed = false;
+            if ($(".generatorRow").length === 1) {
+                singleGenSpeed = parseInt($(".generatorRow").eq(0).data('stats').speed);
+            }
+
+            $(".machineSpeed option, #defaultAddSpeed option").each(function(){
+                var optionVal = parseInt($(this).prop("value"));
+                if (singleGenSpeed &&
+                    optionVal % singleGenSpeed === 0 &&
+                    optionVal !== 0 &&
+                    singleGenSpeed !== 1) {
+                    var times = optionVal / singleGenSpeed;
+                    if (parseInt(times & (times - 1)) === 0) { //powers of 2 only
+                        $(this).text(optionVal + " RPM (" + times + "x)");
+                    }
+                } else {
+                    $(this).text(optionVal + " RPM");
+                }
+            });
+        }
+
         function getRPMOptions(defaultSelected) {
             var temp = [];
             defaultSelected = parseInt(defaultSelected);
             for (const e in data.rpmOptions) {
-                var issel = (data.rpmOptions[e] === defaultSelected) ? "selected" : "";
-                temp.push("<option value='"+data.rpmOptions[e]+"' "+issel+">"+data.rpmOptions[e]+" RPM</option>")
+                var isSelected = (data.rpmOptions[e] === defaultSelected) ? "selected" : "";
+                var theSpeed = data.rpmOptions[e];
+                temp.push("<option value='"+theSpeed+"' "+isSelected+">"+theSpeed+" RPM</option>")
             }
             return temp.join("\n");
         }
@@ -458,9 +481,10 @@
                     var speed = parseInt(newVal[1]);
                     var quantity = parseInt(quantityInput.val());
                     var totalSU = stressCapacity * speed * quantity;
-                    generatingText = (stressCapacity * speed)+" SU @ "+speed+"RPM x "+quantity+" = "+(totalSU)+" SU";
+                    generatingText = (stressCapacity * speed)+" SU @ "+speed+" RPM x "+quantity+" = "+(totalSU)+" SU";
                     rowStats = {
-                        "SU": totalSU
+                        "SU": totalSU,
+                        "speed": speed
                     };
                 }
                 parentRow.data("stats", rowStats).find(".info").html(generatingText);
@@ -505,6 +529,7 @@
                 }
                 $("#statsNet").html((net>0 ? "+" : "")+net+" SU Remaining");
                 $("#statsCapacity").html(statsText);
+                updateSpeedDropdownLabels();
             }
 
             $("#addGeneratorButton").click(function(){
