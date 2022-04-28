@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Calculator </title>
+    <title>Create Calculator 1.0</title>
     <style>
         body, html, input, button, select, textarea {
             font-family: monospace;
             font-size: 16px;
             padding: 3px;
             margin: 2px;
+        }
+        a {
+            color: gray;
         }
         body {
             display: flex;
@@ -72,6 +75,7 @@
             position: sticky;
             top: 0;
             font-size: 18px;
+            line-height: 30px;
         }
         .info {
             padding: 7px;
@@ -82,6 +86,19 @@
         .tooSlowWarning {
             color: #8d5a00;
         }
+        #generateURLBox {
+            border: 2px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+        #generateURLTextArea {
+            width: 100%;
+            min-height: 50px;
+        }
+        .header {
+            font-size: 18px;
+            padding-bottom: 10px;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -89,7 +106,7 @@
         Create Calculator
         pineappleclock@gmail.com
         reddit: pineappleclock
-        v 1.0
+        v 1.0a
         4-27-2022
          */
 
@@ -104,7 +121,7 @@
             ],
             machines: [
                 {
-                    name: "Mechanical Belt",
+                    name: "Belt, Mechanical",
                     stressPerRPM: 1
                 },
                 {
@@ -221,7 +238,7 @@
                 {
                     name: "Furnace Engine",
                     config: [
-                        ["Vanilla Furnace", 1024, 16],
+                        ["Furnace", 1024, 16],
                         ["Blast Furnace", 1024, 32]
                     ]
                 },
@@ -238,29 +255,28 @@
                     ]
                 },
                 {
-                    //0,1,2,3,4,8,12,16,20,24,28,32,48,64,80,96,112,128,192,256
                     name: "Creative Motor",
                     config: [
                         ["0 RPM", 0, 0],
-                        ["1 RPM", CREATIVE_SU, 1, CREATIVE_SU],
-                        ["2 RPM", CREATIVE_SU, 2, CREATIVE_SU],
-                        ["3 RPM", CREATIVE_SU, 3, CREATIVE_SU],
-                        ["4 RPM", CREATIVE_SU, 4, CREATIVE_SU],
-                        ["8 RPM", CREATIVE_SU, 8, CREATIVE_SU],
-                        ["12 RPM", CREATIVE_SU, 12, CREATIVE_SU],
-                        ["16 RPM", CREATIVE_SU, 16, CREATIVE_SU],
-                        ["20 RPM", CREATIVE_SU, 20, CREATIVE_SU],
-                        ["24 RPM", CREATIVE_SU, 24, CREATIVE_SU],
-                        ["28 RPM", CREATIVE_SU, 28, CREATIVE_SU],
-                        ["32 RPM", CREATIVE_SU, 32, CREATIVE_SU],
-                        ["48 RPM", CREATIVE_SU, 48, CREATIVE_SU],
-                        ["64 RPM", CREATIVE_SU, 64, CREATIVE_SU],
-                        ["80 RPM", CREATIVE_SU, 80, CREATIVE_SU],
-                        ["96 RPM", CREATIVE_SU, 96, CREATIVE_SU],
-                        ["112 RPM", CREATIVE_SU, 112, CREATIVE_SU],
-                        ["128 RPM", CREATIVE_SU, 128, CREATIVE_SU],
-                        ["192 RPM", CREATIVE_SU, 192, CREATIVE_SU],
-                        ["256 RPM", CREATIVE_SU, 256, CREATIVE_SU]
+                        ["1 RPM", CREATIVE_SU, 1],
+                        ["2 RPM", CREATIVE_SU, 2],
+                        ["3 RPM", CREATIVE_SU, 3],
+                        ["4 RPM", CREATIVE_SU, 4],
+                        ["8 RPM", CREATIVE_SU, 8],
+                        ["12 RPM", CREATIVE_SU, 12],
+                        ["16 RPM", CREATIVE_SU, 16],
+                        ["20 RPM", CREATIVE_SU, 20],
+                        ["24 RPM", CREATIVE_SU, 24],
+                        ["28 RPM", CREATIVE_SU, 28],
+                        ["32 RPM", CREATIVE_SU, 32],
+                        ["48 RPM", CREATIVE_SU, 48],
+                        ["64 RPM", CREATIVE_SU, 64],
+                        ["80 RPM", CREATIVE_SU, 80],
+                        ["96 RPM", CREATIVE_SU, 96],
+                        ["112 RPM", CREATIVE_SU, 112],
+                        ["128 RPM", CREATIVE_SU, 128],
+                        ["192 RPM", CREATIVE_SU, 192],
+                        ["256 RPM", CREATIVE_SU, 256]
                     ]
                 }
             ]
@@ -516,12 +532,12 @@
 
                 var net = totalGenSU - totalConsumeSU;
                 var pc = Math.round(totalConsumeSU / totalGenSU * 1000)/10;
-                var statsText = "at equilibrium";
+                var statsText = "At equilibrium";
+                $(".osAlert").removeClass("overstressed");
                 if (net > 0) {
-                    statsText = "at "+pc+"% capacity";
-                    $(".osAlert").removeClass("overstressed");
+                    statsText = "At "+pc+"% capacity";
                 } else if (net < 0) {
-                    statsText = "at "+pc+"% capacity";
+                    statsText = "At "+pc+"% capacity";
                     $(".osAlert").addClass("overstressed");
                 }
                 if (totalGenSU == 0) {
@@ -625,25 +641,14 @@
 <div id="main">
     <button id="resetEverything">Reset</button>
     <button id="showURLBox">Generate URL</button>
-    <span id="theTitle">Create Calculator 1.0 (Create 0.3)</span>
-    <style>
-        #generateURLBox {
-            border: 2px solid black;
-            padding: 10px;
-            margin: 10px;
-        }
-        #generateURLTextArea {
-            width: 100%;
-            min-height: 50px;
-        }
-    </style>
+    <span id="theTitle">Create Calculator 1.0 (<a href="https://create.fandom.com/wiki/Create_Mod_Wiki" target="_blank">Create 0.3</a>)</span>
     <div id="generateURLBox" style="display: none;">
-        == Generate URL == <br>
+        <div class="header">== Generate URL ==</div> <br>
         Name this project (optional): <input type="text" id="projectName"> <button id="projectNameSet">Generate</button><br>
         URL: <textarea id="generateURLTextArea"></textarea>
     </div>
     <hr/>
-    == Generators ==
+    <div class="header">== Generators ==</div>
     <table id="generatorsTable">
         <tr>
             <th class="item">Generator</th>
@@ -659,7 +664,7 @@
         </tr>
     </table>
     <hr/>
-    == Machines ==
+    <div class="header">== Machines ==</div>
     <table id="machinesTable">
         <tr>
             <th class="item">Machine</th>
@@ -675,7 +680,7 @@
     </table>
 </div>
 <div id="flyout">
-    <div>== Stats ==</div>
+    <div class="header">== Stats ==</div>
     <div><strong>Total Generation:</strong> <span id="statsTotalGen">0 SU</span></div>
     <div><strong>Total Consumption:</strong> <span id="statsTotalConsume">0 SU</span></div>
     <div><strong>Net:</strong> <span id="statsNet" class="osAlert"></span></div>
