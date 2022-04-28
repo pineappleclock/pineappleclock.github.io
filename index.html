@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Calculator </title>
+    <style>
+        body, html, input, button, select, textarea {
+            font-family: monospace;
+            font-size: 16px;
+            padding: 3px;
+            margin: 2px;
+        }
+        body {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table, th, td {
+            border: 1px solid #b3aeae;
+            border-collapse: collapse;
+        }
+        table {
+            width: 100%;
+        }
+        td {
+            min-width: 15%;
+            padding: 2px;
+        }
+        tr.generatorRow {
+            background-color: #cae1c7;
+        }
+        tr.generatorRow:nth-child(even) {
+            background-color: #c5d6c3;
+        }
+        tr.machineRow {
+            background-color: #eadccf;
+        }
+        tr.machineRow:nth-child(even) {
+            background-color: #ddcdbe;
+        }
+        th.item {
+            width: 25%;
+        }
+        th.quan {
+            width: 8%;
+        }
+        th.config, th.speed {
+            width: 20%;
+        }
+        th.action {
+            width: 10%;
+        }
+        #main, #flyout {
+            padding: 15px;
+        }
+        input[type=number] {
+            width: 50px;
+        }
+        #main {
+            width: 70%;
+            height: 150vh;
+            font-size: 16px;
+        }
+        #flyout {
+            border: 2px solid black;
+            justify-content: space-between;
+            width: 25%;
+            height: 25vh;
+            min-height: 100px;
+            background-color: #fafafa
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            font-size: 18px;
+        }
+        .info {
+            padding: 7px;
+        }
+        .overstressed {
+            color: #c00000;
+        }
+        .tooSlowWarning {
+            color: #8d5a00;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        /*
+        Create Calculator
+        pineappleclock@gmail.com
+        reddit: pineappleclock
+        v 1.0
+        4-27-2022
+         */
+
+        const CREATIVE_SU = 16384;
+        const serializeVersion = "2";
+        var rehydrate = [];
+        var rehydrateInterval = false;
+        var data = {
+            rpmDefault: 16,
+            rpmOptions: [
+                0,1,2,3,4,8,12,16,20,24,28,32,48,64,80,96,112,128,192,256
+            ],
+            machines: [
+                {
+                    name: "Mechanical Belt",
+                    stressPerRPM: 1
+                },
+                {
+                    name: "Cuckoo Clock",
+                    stressPerRPM: 1
+                },
+                {
+                    name: "Encased Fan",
+                    stressPerRPM: 2
+                },
+                {
+                    name: "Crafter, Mechanical (Each)",
+                    stressPerRPM: 2
+                },
+                {
+                    name: "Weighted Ejector",
+                    stressPerRPM: 2
+                },
+                {
+                    name: "Deployer",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Hose Pulley",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Bearing, Mechanical",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Drill, Mechanical",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Mixer, Mechanical",
+                    stressPerRPM: 4,
+                    minRPM: 32
+                },
+                {
+                    name: "Piston, Mechanical",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Pump, Mechanical",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Saw, Mechanical",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Millstone",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Rope Pulley",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Clockwork Bearing",
+                    stressPerRPM: 4
+                },
+                {
+                    name: "Crushing Wheel (each)",
+                    stressPerRPM: 8
+                },
+                {
+                    name: "Arm, Mechanical",
+                    stressPerRPM: 8
+                },
+                {
+                    name: "Press, Mechanical",
+                    stressPerRPM: 8
+                }
+            ],
+            generators: [
+                {
+                    name: "Encased Fan",
+                    config: [
+                        ["Default", 16, 4 ]
+                    ]
+                },
+                {
+                    name: "Furnace Engine",
+                    config: [
+                        ["Vanilla Furnace", 1024, 16],
+                        ["Blast Furnace", 1024, 32]
+                    ]
+                },
+                {
+                    name: "Hand Crank",
+                    config: [
+                        ["Default", 8, 32 ]
+                    ]
+                },
+                {
+                    name: "Valve Handle",
+                    config: [
+                        ["Default", 8, 16 ]
+                    ]
+                },
+                {
+                    name: "Windmill Bearing",
+                    config: [
+                        ["8-15 wool/sail blocks", 512, 1 ],
+                        ["16-23 wool/sail blocks", 512, 2 ],
+                        ["24-31 wool/sail blocks", 512, 3 ],
+                        ["32-39 wool/sail blocks", 512, 4 ],
+                        ["40-47 wool/sail blocks", 512, 5 ],
+                        ["48-55 wool/sail blocks", 512, 6 ],
+                        ["56-63 wool/sail blocks", 512, 7 ],
+                        ["64-71 wool/sail blocks", 512, 8 ],
+                        ["72-79 wool/sail blocks", 512, 9 ],
+                        ["80-87 wool/sail blocks", 512, 10 ],
+                        ["88-95 wool/sail blocks", 512, 11 ],
+                        ["96-103 wool/sail blocks", 512, 12 ],
+                        ["104-111 wool/sail blocks", 512, 13 ],
+                        ["112-119 wool/sail blocks", 512, 14 ],
+                        ["120-127 wool/sail blocks", 512, 15 ],
+                        ["128+ wool/sail blocks", 512, 16 ]
+                    ]
+                },
+                {
+                    name: "Waterwheel",
+                    config: [
+                        ["One face", 16, 4+4 ],
+                        ["Two faces", 16, 4+8 ],
+                        ["Three faces", 16, 4+12 ],
+                        ["Four faces (w/ Soul Sand)", 16, 4+16 ]
+                    ]
+                },
+                {
+                    //0,1,2,3,4,8,12,16,20,24,28,32,48,64,80,96,112,128,192,256
+                    name: "Creative Motor",
+                    config: [
+                        ["0 RPM", 0, 0],
+                        ["1 RPM", 1, CREATIVE_SU],
+                        ["2 RPM", 2, CREATIVE_SU],
+                        ["3 RPM", 3, CREATIVE_SU],
+                        ["4 RPM", 4, CREATIVE_SU],
+                        ["8 RPM", 8, CREATIVE_SU],
+                        ["12 RPM", 12, CREATIVE_SU],
+                        ["16 RPM", 16, CREATIVE_SU],
+                        ["20 RPM", 20, CREATIVE_SU],
+                        ["24 RPM", 24, CREATIVE_SU],
+                        ["28 RPM", 28, CREATIVE_SU],
+                        ["32 RPM", 32, CREATIVE_SU],
+                        ["48 RPM", 48, CREATIVE_SU],
+                        ["64 RPM", 64, CREATIVE_SU],
+                        ["80 RPM", 80, CREATIVE_SU],
+                        ["96 RPM", 96, CREATIVE_SU],
+                        ["112 RPM", 112, CREATIVE_SU],
+                        ["128 RPM", 128, CREATIVE_SU],
+                        ["128 RPM", 128, CREATIVE_SU],
+                        ["192 RPM", 192, CREATIVE_SU],
+                        ["256 RPM", 256, CREATIVE_SU]
+                    ]
+                }
+            ]
+        };
+
+        function getRPMOptions(defaultSelected) {
+            var temp = [];
+            defaultSelected = parseInt(defaultSelected);
+            for (const e in data.rpmOptions) {
+                var issel = (data.rpmOptions[e] === defaultSelected) ? "selected" : "";
+                temp.push("<option value='"+data.rpmOptions[e]+"' "+issel+">"+data.rpmOptions[e]+" RPM</option>")
+            }
+            return temp.join("\n");
+        }
+
+        function writeURL() {
+            var serialize = [];
+            serialize.push(['v',serializeVersion]);
+            $(".generatorRow").each(function(){
+               var drop = $(this).find(".generatorDropdown").prop("selectedIndex");
+               var quan = $(this).find(".quantity").val();
+               var config = $(this).find(".generatorConfiguration").prop("selectedIndex");
+               serialize.push(['g',drop,quan,config]);
+            });
+            $(".machineRow").each(function(){
+                var drop = $(this).find(".machineDropdown").prop("selectedIndex");
+                var quan = $(this).find(".quantity").val();
+                var speed = $(this).find(".machineSpeed").prop("selectedIndex");
+                serialize.push(['m',drop,quan,speed]);
+            });
+            if ($("#projectName").val()) {
+                serialize.push(['n', btoa($("#projectName").val())]);
+            }
+
+            var blob = btoa(serialize.join("|"));
+            var url = new URL(window.location.href);
+            url.searchParams.set('ccd',blob);
+            $("#generateURLTextArea").val(url.toString());
+        }
+
+        function doNextRehydrate() {
+            var shouldContinue = true;
+            var instruction = rehydrate.shift();
+            if (rehydrate.length === 0) {
+                shouldContinue = false;
+            }
+            if (instruction.indexOf(",") === -1) {
+                alert("The URL that was provided was malformed.");
+                clearInterval(rehydrateInterval);
+                rehydrateInterval = false;
+                return;
+            }
+            var command = instruction.split(",");
+            var context;
+            switch (command[0]) {
+                case 'v':
+                    if (command[1] != serializeVersion) {
+                        $("#theTitle").after("<div style='color:red'>The URL you entered is for an older version of this calculator (v"+command[1]+") != (v"+serializeVersion+")</div>");
+                    }
+                    break;
+                case 'g':
+                    $("#addGeneratorButton").trigger("click");
+                    context = $(".generatorRow:last");
+                    context.find(".quantity").val(command[2]);
+                    context.find(".generatorDropdown option").eq(command[1]).prop('selected', true).trigger("change");
+                    context.find(".generatorConfiguration option").eq(command[3]).prop('selected',true).trigger("change");
+                    break;
+                case 'm':
+                    $("#addMachineButton").trigger("click");
+                    context = $(".machineRow:last");
+                    context.find(".quantity").val(command[2]);
+                    context.find(".machineDropdown option").eq(command[1]).prop('selected', true);
+                    context.find(".machineSpeed option").eq(command[3]).prop('selected', true).trigger("change");
+                    break;
+                case 'n':
+                    var projectName = atob(command[1]);
+                    $("#theTitle").text($("#theTitle").text() + " | " + projectName);
+                    $("#projectName").val(projectName);
+                    break;
+                default:
+                    alert("The URL that was provided was malformed.");
+                    shouldContinue = false;
+                    return;
+            }
+            if (!shouldContinue) {
+                clearInterval(rehydrateInterval);
+                rehydrateInterval = false;
+            }
+        }
+
+        function readURL() {
+            var url = new URL(window.location.href);
+            var test = url.searchParams.get('ccd');
+            if (test === null) return;
+            var serString;
+            try {
+                serString = atob(test);
+            } catch(error) {
+                alert("The URL that was provided was malformed.");
+                return;
+            }
+            rehydrate = serString.split("|");
+
+            rehydrateInterval = setInterval(function(){
+                doNextRehydrate();
+            }, 50);
+        }
+
+        $(document).ready(function(){
+
+            readURL();
+
+            $("#projectNameSet").click(function(){
+                writeURL();
+            });
+
+            $("#showURLBox").click(function(){
+                $("#generateURLBox").toggle();
+            })
+
+            data.machines.sort((a,b) => (a.name > b.name) ? 1 : -1);
+
+            $("#defaultAddSpeed").html(getRPMOptions(data.rpmDefault));
+
+            $("#resetEverything").click(function(){
+               $(".actRemove").each(function(){
+                   $(this).trigger("click");
+               });
+            });
+
+            $("#machinesTable").on("change", ".machineDropdown, .quantity, .machineSpeed", function(){
+                var parentRow = $(this).closest("tr");
+                var machine = parentRow.find(".machineDropdown").val();
+                var quantity = parentRow.find(".quantity").val();
+                var machineSpeed = parentRow.find(".machineSpeed").val();
+                var rowStats = {};
+                var consumptionText = "";
+                for (const e of data.machines) {
+                    if (e.name === machine) {
+                        var stressPerRPM = e.stressPerRPM;
+                        var totalImpact = stressPerRPM * machineSpeed * quantity;
+                        consumptionText = stressPerRPM+" SU @ "+machineSpeed+" RPM x "+quantity+" = "+totalImpact+" SU";
+                        if (typeof e.minRPM !== 'undefined' && e.minRPM > machineSpeed) {
+                            consumptionText = consumptionText + "<div class='tooSlowWarning'>(!) Too Slow to Run</div>";
+                        }
+                        rowStats = {
+                            "SU" : totalImpact
+                        };
+                        break;
+                    }
+                }
+                parentRow.data("stats", rowStats).find(".info").html(consumptionText);
+                recalculate();
+            }).on("click", ".actRemove", function(){
+                var parentRow = $(this).closest("tr");
+                parentRow.remove();
+                recalculate();
+            });
+
+            $("#generatorsTable").on("change", ".generatorDropdown", function(){
+                var parentRow = $(this).closest("tr");
+                var newVal = $(this).val();
+                if (newVal === '') {
+                    parentRow.remove(".generatorConfiguration");
+                } else {
+                    var generatorConfigObj = "";
+                    for (const e of data.generators) {
+                        if (e.name === newVal) {
+                            generatorConfigObj = $("<select>", {
+                                "class": "generatorConfiguration"
+                            });
+                            for (const f of e.config) {
+                                generatorConfigObj.append(
+                                    $("<option>", {
+                                        value: [f[1],f[2]].join(",")
+                                    }).text(f[0])
+                                );
+                            }
+                            break;
+                        }
+                    }
+                }
+                parentRow.find("td").eq(2).html("").append(generatorConfigObj);
+                generatorConfigObj.trigger("change");
+            }).on("change", ".generatorConfiguration, .quantity", function(){
+                var parentRow = $(this).closest("tr");
+                var quantityInput = parentRow.find(".quantity");
+                var configSelect = parentRow.find(".generatorConfiguration");
+                var generatingText = "";
+                var rowStats = false;
+                if (configSelect.length) {
+                    var newVal = configSelect.val().split(",");
+                    var stressCapacity = parseInt(newVal[0]);
+                    var speed = parseInt(newVal[1]);
+                    var quantity = parseInt(quantityInput.val());
+                    var totalSU = stressCapacity * speed * quantity;
+                    generatingText = (stressCapacity * speed)+" SU @ "+speed+"RPM x "+quantity+" = "+(totalSU)+" SU";
+                    rowStats = {
+                        "SU": totalSU
+                    };
+                }
+                parentRow.data("stats", rowStats).find(".info").html(generatingText);
+                recalculate();
+            }).on("click", ".actRemove", function(){
+                var parentRow = $(this).closest("tr");
+                parentRow.remove();
+                recalculate();
+            });
+
+            function recalculate() {
+                var totalGenSU = 0;
+                var totalConsumeSU = 0;
+                $("#generatorsTable tr").each(function(){
+                    var rowData = $(this).data("stats");
+                    if (rowData) {
+                        totalGenSU += rowData.SU;
+                    }
+                });
+                $("#statsTotalGen").text(totalGenSU + " SU");
+
+                $("#machinesTable tr").each(function(){
+                    var rowData = $(this).data("stats");
+                    if (rowData) {
+                        totalConsumeSU += rowData.SU;
+                    }
+                });
+                $("#statsTotalConsume").text(totalConsumeSU + " SU");
+
+                var net = totalGenSU - totalConsumeSU;
+                var pc = Math.round(totalConsumeSU / totalGenSU * 1000)/10;
+                var statsText = "at equilibrium";
+                if (net > 0) {
+                    statsText = "at "+pc+"% capacity";
+                    $(".osAlert").removeClass("overstressed");
+                } else if (net < 0) {
+                    statsText = "at "+pc+"% capacity";
+                    $(".osAlert").addClass("overstressed");
+                }
+                if (totalGenSU == 0) {
+                    statsText = "N/A";
+                }
+                $("#statsNet").html((net>0 ? "+" : "")+net+" SU Remaining");
+                $("#statsCapacity").html(statsText);
+            }
+
+            $("#addGeneratorButton").click(function(){
+
+                var colGenerator = $("<td>");
+
+                var generatorSelect = $("<select>", {
+                    "class": "generatorDropdown"
+                });
+
+                generatorSelect.append(
+                        $("<option>", { value: "" }).text("-- select --")
+                );
+                for (const e of data.generators) {
+                    generatorSelect.append(
+                            $("<option>", { value: e.name }).text(e.name)
+                    );
+                }
+                colGenerator.append(generatorSelect);
+                var colQuantity = $("<td>").append(
+                        $("<input>", {
+                            class: "quantity",
+                            type: "number",
+                            step: "1",
+                            value: "1",
+                            min: "0"
+                        })
+                );
+                var colActions = $("<td>").append(
+                    $("<button>",{
+                        "class": "actRemove"
+                    }).text("Remove")
+                );
+                var infoCol = $("<td>").append(
+                    $("<div class='info'>")
+                );
+
+                var toAppend = $("<tr>", {
+                    "class" : "generatorRow"
+                }).append(colGenerator, colQuantity, $("<td>"),infoCol, colActions);
+                $("#generatorsTable").append(toAppend);
+            });
+
+            $("#addMachineButton").click(function(){
+                var colMachine = $("<td>");
+
+                var machineSelect = $("<select>", {
+                    "class": "machineDropdown"
+                });
+
+                machineSelect.append(
+                    $("<option>", { value: "" }).text("-- select --")
+                );
+                for (const e of data.machines) {
+                    machineSelect.append(
+                        $("<option>", { value: e.name }).text(e.name)
+                    );
+                }
+                colMachine.append(machineSelect);
+                var colQuantity = $("<td>").append(
+                    $("<input>", {
+                        class: "quantity",
+                        type: "number",
+                        step: "1",
+                        value: "1",
+                        min: "0"
+                    })
+                );
+                var colSpeed = $("<td>").append(
+                    $("<select>", {
+                    "class": "machineSpeed"
+                }).html(getRPMOptions($("#defaultAddSpeed").val())));
+
+                var colActions = $("<td>").append(
+                    $("<button>",{
+                        "class": "actRemove"
+                    }).text("Remove")
+                );
+
+                var infoCol = $("<td>").append(
+                    $("<div class='info'>")
+                );
+
+                var toAppend = $("<tr>", {
+                    "class" : "machineRow"
+                }).append(colMachine, colQuantity, colSpeed, infoCol, colActions);
+                $("#machinesTable").append(toAppend);
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="main">
+    <button id="resetEverything">Reset</button>
+    <button id="showURLBox">Generate URL</button>
+    <span id="theTitle">Create Calculator 1.0 (Create 0.3)</span>
+    <style>
+        #generateURLBox {
+            border: 2px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+        #generateURLTextArea {
+            width: 100%;
+            min-height: 50px;
+        }
+    </style>
+    <div id="generateURLBox" style="display: none;">
+        == Generate URL == <br>
+        Name this project (optional): <input type="text" id="projectName"> <button id="projectNameSet">Generate</button><br>
+        URL: <textarea id="generateURLTextArea"></textarea>
+    </div>
+    <hr/>
+    == Generators ==
+    <table id="generatorsTable">
+        <tr>
+            <th class="item">Generator</th>
+            <th class="quan">Quantity</th>
+            <th class="config">Configuration</th>
+            <th class="info">Generating</th>
+            <th class="action"></th>
+        </tr>
+        <tr>
+            <td colspan="5">
+                <button id="addGeneratorButton">Add Generator</button>
+            </td>
+        </tr>
+    </table>
+    <hr/>
+    == Machines ==
+    <table id="machinesTable">
+        <tr>
+            <th class="item">Machine</th>
+            <th class="quan">Quantity</th>
+            <th class="speed">Speed</th>
+            <th class="info">Consumption</th>
+            <th class="action"></th>
+        </tr>
+        <tr>
+            <td colspan="5"><button id="addMachineButton">Add Machine</button> at speed: <select id="defaultAddSpeed"></select></td>
+
+        </tr>
+    </table>
+</div>
+<div id="flyout">
+    <div>== Stats ==</div>
+    <div><strong>Total Generation:</strong> <span id="statsTotalGen">0 SU</span></div>
+    <div><strong>Total Consumption:</strong> <span id="statsTotalConsume">0 SU</span></div>
+    <div><strong>Net:</strong> <span id="statsNet" class="osAlert"></span></div>
+    <div><strong>Capacity:</strong> <span id="statsCapacity" class="osAlert"></span></div>
+</div>
+</body>
+</html>
