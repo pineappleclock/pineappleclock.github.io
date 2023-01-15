@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Frog Sizer 1</title>
+    <style>
+        body, html, input, button, select, textarea {
+            font-family: monospace;
+            font-size: 16px;
+            padding: 3px;
+            margin: 2px;
+        }
+        a {
+            color: gray;
+        }
+        body {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table, th, td {
+            border: 1px solid #b3aeae;
+            border-collapse: collapse;
+        }
+        table {
+            width: 100%;
+        }
+        td {
+            min-width: 15%;
+            padding: 2px;
+        }
+        tr.generatorRow {
+            background-color: #cae1c7;
+        }
+        tr.generatorRow:nth-child(even) {
+            background-color: #c5d6c3;
+        }
+        tr.machineRow {
+            background-color: #eadccf;
+        }
+        tr.machineRow:nth-child(even) {
+            background-color: #ddcdbe;
+        }
+        th.item {
+            width: 25%;
+        }
+        th.quan {
+            width: 8%;
+        }
+        th.config, th.speed {
+            width: 20%;
+        }
+        th.action {
+            width: 10%;
+        }
+        #main, #flyout {
+            padding: 15px;
+        }
+        input[type=number] {
+            width: 50px;
+        }
+        #main {
+            width: 70%;
+            height: 150vh;
+            font-size: 16px;
+        }
+        #flyout {
+            border: 2px solid black;
+            justify-content: space-between;
+            width: 25%;
+            height: 25vh;
+            min-height: 100px;
+            background-color: #fafafa
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            font-size: 18px;
+            line-height: 30px;
+        }
+        .info {
+            padding: 7px;
+        }
+        .overstressed {
+            color: #c00000;
+        }
+        .tooSlowWarning {
+            color: #8d5a00;
+        }
+        #generateURLBox {
+            border: 2px solid black;
+            padding: 10px;
+            margin: 10px;
+        }
+        #generateURLTextArea {
+            width: 100%;
+            min-height: 50px;
+        }
+        .header {
+            font-size: 18px;
+            padding-bottom: 10px;
+        }
+		textarea {
+			width: 98%;
+			min-height: 200px;
+		}
+		#results {
+			font-size: 31px;
+			1px solid #5656bf;
+			border-radius: 11px;
+			padding: 7px;
+		}
+		#results.proto {
+			color: #aaa;
+		}
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+	window.actionTimer = false;
+	$(document).ready(function(){
+		$("#data").change(function(e){
+			inputChanged();
+		});
+		$("#data").keydown(function(e){
+			inputChanged();
+		});
+	});
+	function inputChanged() {
+			if (window.actionTimer == false) {
+				window.actionTimer = setInterval(function(){ attemptParse(); }, 500);
+			}	
+	}
+	function attemptParse() {
+		clearInterval(window.actionTimer);
+		window.actionTimer = false;
+		let d = $("#data").val();
+		let regex = /FrogAmount: ([\d\\.]+)/;
+		let results = d.match(regex);
+		if (results) {
+			$("#results").text("Frog Size: " + results[1] + " meters").removeClass("proto");
+			$("#data").val("");
+		}
+	}
+    </script>
+</head>
+<body>
+<div id="main">
+<h2>Frog Sizer</h2>
+<p>Look at a mob, hit F3+i, then paste the contents in the box below:</p>
+<textarea id='data'></textarea>
+<div id='results' class='proto'>Results will be shown here.</div>
+</body>
+</html>
